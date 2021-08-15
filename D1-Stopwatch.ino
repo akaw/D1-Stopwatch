@@ -5,8 +5,7 @@
 
 //Pins
 #define BUTTON_STOP_PIN D5
-#define BUTTON_RESUME_PIN D6
-#define BUTTON_START_PIN D7
+#define BUTTON_START_PIN D6
 
 //Chrono lib
 Chrono chrono(Chrono::SECONDS);
@@ -24,6 +23,7 @@ int seconds = 0, hours = 0, minutes = 0;
 
 void setup()
 {
+    chrono.stop();
     Serial.begin(115200);
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     display.display();
@@ -33,10 +33,10 @@ void setup()
 
     buttonStart.setClickHandler(click);
     buttonStop.setClickHandler(click);
+    buttonStop.setLongClickHandler(click);
 
     Serial.println("");
     Serial.println("Ready!");
-    chrono.stop();
 }
 
 void loop()
@@ -97,11 +97,12 @@ void wDisplay()
 
 void click(Button2 &btn)
 {
-    if (btn == buttonStart)
+    if (btn == buttonStart || (btn == buttonStop && btn.getClickType() == LONG_CLICK))
     {
         chrono.restart();
     }
-    if (btn == buttonStop)
+
+    if (btn == buttonStop && btn.getClickType() == SINGLE_CLICK)
     {
         if (chrono.isRunning())
         {
